@@ -1,0 +1,411 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
+#cmakedefine PACKAGE "@PACKAGE@"
+#cmakedefine VERSION "@VERSION@"
+
+#define SASL_VERSION_MAJOR @SASL_VERSION_MAJOR@
+#define SASL_VERSION_MINOR @SASL_VERSION_MINOR@
+#define SASL_VERSION_STEP @SASL_VERSION_STEP@
+
+#cmakedefine HAVE_CADDR_T 1
+
+#ifdef _WIN32
+#include <winsock2.h>
+#include <tchar.h>
+#include <stddef.h>
+
+#ifndef HAVE_CADDR_T
+#ifndef caddr_t
+typedef unsigned char *caddr_t;
+#define HAVE_CADDR_T 1
+#endif
+#endif
+
+#ifndef _INTPTR_T_DEFINED
+#ifdef _WIN64
+typedef __int64 intptr_t;
+#else
+typedef int intptr_t;
+#endif
+#endif
+
+#define SASL_ROOT_KEY "SOFTWARE\\Project Cyrus\\SASL Library"
+#define SASL_PLUGIN_PATH_ATTR "PluginDir"
+#define SASL_CONF_PATH_ATTR "ConfDir"
+#define SASL_DB_PATH_ATTR "SaslDBName"
+#define SASL_DB_PATH "c:\\CMU\\sasldb2"
+
+#include <windows.h>
+inline static unsigned int sleep(unsigned int seconds) {
+    Sleep(seconds * 1000);
+    return 0;
+}
+
+#define strcasecmp _stricmp
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+#define snprintf _snprintf
+#endif
+#define strncasecmp _strnicmp
+#define strdup _strdup
+#define sasl_getpid GetCurrentThreadId
+
+#define MAXHOSTNAMELEN 1024
+
+#define WITHOUT_NANA
+#define L_DEFAULT_GUARD (0)
+#define I_DEFAULT_GUARD (0)
+#define I(foo)
+#define VL(foo) printf foo;
+#define VLP(foo,bar)
+
+#ifndef __attribute__
+#define __attribute__(foo)
+#endif
+
+typedef int int32_t;
+typedef __int64 int64_t;
+#ifdef _WIN64
+typedef int64_t ssize_t;
+#else
+typedef int32_t ssize_t;
+#endif
+
+#define PLUGINDIR "@SASL_PLUGINDIR@"
+#define CONFIGDIR "@SASL_CONFIGDIR@"
+
+#define HIER_DELIMITER '\\'
+
+#if TARGET_WIN_SYSTEM >= 51
+#if !defined(_WIN32_WINNT)
+#define _WIN32_WINNT 0x0510
+#endif
+#endif
+
+#if defined(_MSC_VER) && (_MSC_VER >= 1300)
+#define HAVE_GETADDRINFO
+#define HAVE_GETNAMEINFO
+#define HAVE_STRUCT_SOCKADDR_STORAGE
+#include <Ws2tcpip.h>
+#endif
+
+#if !defined(HAVE_STRUCT_SOCKADDR_STORAGE) && !defined(_SS_MAXSIZE)
+#define _SS_MAXSIZE 128
+#define _SS_PADSIZE (_SS_MAXSIZE - sizeof(struct sockaddr))
+struct sockaddr_storage {
+    struct sockaddr ss_sa;
+    char __ss_pad2[_SS_PADSIZE];
+};
+#define ss_family ss_sa.sa_family
+#endif
+
+#ifndef AF_INET6
+#define AF_INET6 AF_MAX
+#endif
+
+#ifndef HAVE_GETADDRINFO
+#define getaddrinfo sasl_getaddrinfo
+#define freeaddrinfo sasl_freeaddrinfo
+#define gai_strerror sasl_gai_strerror
+#endif
+
+#ifndef HAVE_GETNAMEINFO
+#define getnameinfo sasl_getnameinfo
+#endif
+
+#if !defined(HAVE_GETNAMEINFO) || !defined(HAVE_GETADDRINFO)
+#include "gai.h"
+#endif
+
+#ifndef AI_NUMERICHOST
+#define AI_NUMERICHOST 4
+#define NI_NUMERICHOST 2
+#define NI_NAMEREQD 4
+#define NI_NUMERICSERV 8
+#endif
+
+#include <time.h>
+
+#ifndef HAVE_SOCKLEN_T
+typedef int socklen_t;
+#endif
+
+#ifndef NO_STATIC_PLUGINS
+#define STATIC_ANONYMOUS 1
+#define STATIC_PLAIN 1
+#define STATIC_SCRAM 1
+#endif
+
+#define HAVE_MEMCPY 1
+
+#else
+
+#define SASL_ROOT_KEY NULL
+#define SASL_PLUGIN_PATH_ATTR "SASL_PLUGINDIR"
+#define SASL_CONF_PATH_ATTR "SASL_CONFDIR"
+#define SASL_DB_PATH_ATTR "SASL_DBNAME"
+#define SASL_DB_PATH "@SASL_DB_PATH@"
+#define PLUGINDIR "@SASL_PLUGINDIR@"
+#define CONFIGDIR "@SASL_CONFIGDIR@"
+
+#cmakedefine HAVE_MEMCPY 1
+#cmakedefine HAVE_MEMSET 1
+#cmakedefine HAVE_STRDUP 1
+#cmakedefine HAVE_STRCHR 1
+#cmakedefine HAVE_STRERROR 1
+#cmakedefine HAVE_STRSPN 1
+#cmakedefine HAVE_STRSTR 1
+#cmakedefine HAVE_STRTOL 1
+#cmakedefine HAVE_GETTIMEOFDAY 1
+#cmakedefine HAVE_INET_ATON 1
+#cmakedefine HAVE_SELECT 1
+#cmakedefine HAVE_SOCKET 1
+#cmakedefine HAVE_GETHOSTNAME 1
+#cmakedefine HAVE_GETDOMAINNAME 1
+#cmakedefine HAVE_GETPWNAM 1
+#cmakedefine HAVE_GETSPNAM 1
+#cmakedefine HAVE_GETPASSPHRASE 1
+#cmakedefine HAVE_ASPRINTF 1
+#cmakedefine HAVE_STRLCAT 1
+#cmakedefine HAVE_STRLCPY 1
+#cmakedefine HAVE_JRAND48 1
+#cmakedefine HAVE_MEMMEM 1
+#cmakedefine HAVE_MKDIR 1
+#cmakedefine HAVE_SYSLOG 1
+#cmakedefine HAVE_GETSUBOPT 1
+#cmakedefine HAVE_SNPRINTF 1
+#cmakedefine HAVE_VSNPRINTF 1
+#cmakedefine HAVE_GETADDRINFO 1
+#cmakedefine HAVE_GETNAMEINFO 1
+#cmakedefine HAVE_GETEUID 1
+#cmakedefine HAVE_GETUID 1
+#cmakedefine HAVE_GETPID 1
+#cmakedefine HAVE_GETLOGIN_R 1
+
+#cmakedefine HAVE_DLFCN_H 1
+#cmakedefine HAVE_FCNTL_H 1
+#cmakedefine HAVE_LIMITS_H 1
+#cmakedefine HAVE_MALLOC_H 1
+#cmakedefine HAVE_PATHS_H 1
+#cmakedefine HAVE_STRINGS_H 1
+#cmakedefine HAVE_STRING_H 1
+#cmakedefine HAVE_SYS_FILE_H 1
+#cmakedefine HAVE_SYS_TIME_H 1
+#cmakedefine HAVE_SYSLOG_H 1
+#cmakedefine HAVE_TIME_H 1
+#cmakedefine HAVE_UNISTD_H 1
+#cmakedefine HAVE_INTTYPES_H 1
+#cmakedefine HAVE_SYS_UIO_H 1
+#cmakedefine HAVE_SYS_PARAM_H 1
+#cmakedefine HAVE_SYSEXITS_H 1
+#cmakedefine HAVE_STDARG_H 1
+#cmakedefine HAVE_VARARGS_H 1
+#cmakedefine HAVE_KRB5_H 1
+#cmakedefine HAVE_NETINET_IN_H 1
+#cmakedefine HAVE_NETDB_H 1
+#cmakedefine HAVE_SYS_UN_H 1
+#cmakedefine HAVE_GETOPT_H 1
+#cmakedefine HAVE_ARPA_INET_H 1
+#cmakedefine HAVE_SYS_SOCKET_H 1
+#cmakedefine HAVE_CRYPT_H 1
+#cmakedefine HAVE_PWD_H 1
+#cmakedefine HAVE_SHADOW_H 1
+#cmakedefine HAVE_SYS_SELECT_H 1
+#cmakedefine HAVE_DIRENT_H 1
+#cmakedefine HAVE_SYS_WAIT_H 1
+#cmakedefine HAVE_SYS_TYPES_H 1
+
+#cmakedefine HAVE_STRUCT_SOCKADDR_STORAGE 1
+#cmakedefine HAVE_SOCKADDR_SA_LEN 1
+#cmakedefine HAVE_SOCKLEN_T 1
+#cmakedefine HAVE_SA_LEN 1
+
+#cmakedefine HAVE_PTHREAD 1
+#cmakedefine HAVE_NT_THREADS 1
+
+#cmakedefine DO_DLOPEN 1
+#cmakedefine TRY_DLOPEN_WHEN_STATIC 1
+#cmakedefine DLSYM_NEEDS_UNDERSCORE 1
+
+#cmakedefine HAVE_SASLAUTHD 1
+#cmakedefine HAVE_PWCHECK 1
+#cmakedefine HAVE_AUTHDAEMON 1
+#cmakedefine HAVE_ALWAYSTRUE 1
+#cmakedefine DO_SASL_CHECKAPOP 1
+#cmakedefine DO_SRP_SETPASS 1
+
+#cmakedefine HAVE_GSSAPI 1
+#cmakedefine HAVE_GSSAPI_H 1
+#cmakedefine HAVE_GSSAPI_GSSAPI_H 1
+#cmakedefine HAVE_GSSAPI_GSSAPI_EXT_H 1
+#cmakedefine HAVE_GSSAPI_GSSAPI_KRB5_H 1
+#cmakedefine HAVE_GSS_C_NT_HOSTBASED_SERVICE 1
+#cmakedefine HAVE_GSS_C_NT_USER_NAME 1
+#cmakedefine HAVE_GSS_SPNEGO 1
+#cmakedefine GSS_USE_MUTEXES 1
+#cmakedefine GSS_USE_CCACHE_STORE 1
+#cmakedefine GSS_USE_LOAD_FROM 1
+#cmakedefine KRB5_HEIMDAL 1
+#cmakedefine STATIC_GSSAPIV2 1
+
+#cmakedefine HAVE_OPIE 1
+#cmakedefine HAVE_PAM 1
+#cmakedefine HAVE_SIA 1
+#cmakedefine HAVE_LDAP 1
+#cmakedefine HAVE_MYSQL 1
+#cmakedefine HAVE_PGSQL 1
+#cmakedefine HAVE_SQLITE 1
+#cmakedefine HAVE_SQLITE3 1
+
+#cmakedefine HAVE_SHA512 1
+#cmakedefine HAVE_LIBOPAQUE 1
+#cmakedefine HAVE_LIBSODIUM 1
+#cmakedefine HAVE_SODIUM_HKDF 1
+
+#cmakedefine AUTH_SASLDB 1
+#cmakedefine HAVE_HTTPFORM 1
+
+#cmakedefine KEEP_DB_OPEN 1
+
+#cmakedefine GETXXNAM_R_5ARG 1
+
+#cmakedefine USE_DOORS 1
+
+#cmakedefine WITH_DMALLOC 1
+
+#cmakedefine HAVE_WINSOCK2 1
+
+#cmakedefine HAVE_GETADDRINFO 1
+#cmakedefine HAVE_GETNAMEINFO 1
+
+#ifndef HAVE_GETADDRINFO
+#define getaddrinfo sasl_getaddrinfo
+#define freeaddrinfo sasl_freeaddrinfo
+#define gai_strerror sasl_gai_strerror
+#endif
+#ifndef HAVE_GETNAMEINFO
+#define getnameinfo sasl_getnameinfo
+#endif
+#if !defined(HAVE_GETNAMEINFO) || !defined(HAVE_GETADDRINFO)
+#include "gai.h"
+#endif
+
+#ifndef AI_NUMERICHOST
+#define AI_NUMERICHOST 4
+#define NI_NUMERICHOST 2
+#define NI_NAMEREQD 4
+#define NI_NUMERICSERV 8
+#endif
+
+#if !defined(_WIN32)
+#if !defined(HAVE_SYS_UIO_H)
+struct iovec {
+    char *iov_base;
+    long iov_len;
+};
+#else
+#include <sys/types.h>
+#ifdef HAVE_SYS_UIO_H
+#include <sys/uio.h>
+#endif
+#endif
+#endif
+
+#ifndef __EXTENSIONS__
+#define __EXTENSIONS__
+#endif
+
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+
+#define SASL_PATH_ENV_VAR "SASL_PATH"
+#define SASL_CONF_PATH_ENV_VAR "SASL_CONF_PATH"
+
+#include <stdlib.h>
+#include <sys/types.h>
+#ifndef WIN32
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#include <netdb.h>
+#ifdef HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif
+#endif
+#include <string.h>
+
+#ifndef HAVE_SOCKLEN_T
+typedef unsigned int socklen_t;
+#endif
+
+#if !defined(HAVE_STRUCT_SOCKADDR_STORAGE) && !defined(WIN32)
+#define _SS_MAXSIZE 128
+#define _SS_PADSIZE (_SS_MAXSIZE - sizeof(struct sockaddr))
+struct sockaddr_storage {
+    struct sockaddr ss_sa;
+    char __ss_pad2[_SS_PADSIZE];
+};
+#define ss_family ss_sa.sa_family
+#endif
+
+#ifndef AF_INET6
+#define AF_INET6 AF_MAX
+#endif
+
+#ifndef HAVE_SYSEXITS_H
+#include "exits.h"
+#else
+#include "sysexits.h"
+#endif
+
+#if TIME_WITH_SYS_TIME
+#include <sys/time.h>
+#include <time.h>
+#else
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
+#endif
+
+#ifndef HIER_DELIMITER
+#define HIER_DELIMITER '/'
+#endif
+
+#ifndef HAVE_STRLCPY
+extern size_t saslauthd_strlcpy(char *dst, const char *src, size_t len);
+#define strlcpy(x,y,z) saslauthd_strlcpy((x),(y),(z))
+#endif
+#ifndef HAVE_STRLCAT
+extern size_t saslauthd_strlcat(char *dst, const char *src, size_t len);
+#define strlcat(x,y,z) saslauthd_strlcat((x),(y),(z))
+#endif
+#ifndef HAVE_ASPRINTF
+extern int asprintf(char **str, const char *fmt, ...);
+#endif
+
+#endif
+
+#ifdef DEV_RANDOM
+#undef DEV_RANDOM
+#endif
+#define DEV_RANDOM "@SASL_DEV_RANDOM@"
+
+#ifndef HAVE_GETSUBOPT
+extern int getsubopt(char **optionp, char * const *tokens, char **valuep);
+#endif
+
+#define RETSIGTYPE void
+
+#if defined __GNUC__ && __GNUC__ > 6
+#define GCC_FALLTHROUGH __attribute__((fallthrough));
+#else
+#define GCC_FALLTHROUGH
+#endif
+
+#endif
