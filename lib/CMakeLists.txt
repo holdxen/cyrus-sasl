@@ -88,10 +88,6 @@ else()
     endif()
 endif()
 
-if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/md5.c")
-    target_compile_definitions(sasl2 PRIVATE)
-endif()
-
 install(TARGETS sasl2
     EXPORT cyrus-sasl-targets
     LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
